@@ -1,2 +1,2 @@
 # ConsoleChess
-Simple chess in console (c++)
+Simple chess in console in C++
