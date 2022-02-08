@@ -17,6 +17,12 @@ private:
     bool gameOver;
 
     std::pair<int, int> getFieldFromString(std::string);
+    void newGame();
+
+    std::string getPiece(int, int);
+    void printHelp(int);
+    void playerSteps();
+    void NewGameStarted();
 
 public:
     enum Exceptions
@@ -25,17 +31,15 @@ public:
     };
 
     ChessView() : model(this) {}
-
     void run();
-    void newGame();
 
-    void NewGameStarted();
-    void UpdateTable();
     void GameOver();
+    void alarmForCheck();
+    void updateTable();
+    bool isGameOver() { return gameOver; }
 
-    std::string getPiece(int, int);
-    void printHelp(int);
-    void playerSteps();
+    //because of tests
+    ChessModel& getModel() { return model; }
 };
 
 #endif /*CHESS_VIEW*/

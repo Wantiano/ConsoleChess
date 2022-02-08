@@ -1,12 +1,11 @@
 #include "chessmodel.h"
 #include "../View/chessview.h"
-#include <iostream>
 
 void ChessModel::newGame()
 {
+    gameOver = false;
     currentPlayer = false;
     resetTable();
-    view->NewGameStarted();
 }
 
 PieceEnum ChessModel::getField(int x, int y)
@@ -26,6 +25,7 @@ bool ChessModel::getFieldColor(int x, int y)
 
 void ChessModel::giveUp()
 {
+    gameOver = true;
     view->GameOver();
 }
 
@@ -92,20 +92,19 @@ void ChessModel::step(int x_from, int y_from, int x_to, int y_to)
     if (table[y_from][x_from] == nullptr)
         throw Exceptions::EMPTYFIELD;
 
-    if (currentPlayer != table[y_from][x_from]->playerColor())
-        throw Exceptions::ILLEGALMOVE;
-
+    // Unable to step there
     if (!table[y_from][x_from]->step(x_to, y_to, table))
         throw Exceptions::ILLEGALMOVE;
 
-    bool king = false;
+    // Opponent's puppet
+    if (currentPlayer != table[y_from][x_from]->playerColor())
+        throw Exceptions::ILLEGALMOVE;
 
     if (table[y_to][x_to] != nullptr)
     {
+        // Step on self puppet
         if (currentPlayer == table[y_to][x_to]->playerColor())
             throw Exceptions::ILLEGALMOVE;
-
-        king = table[y_to][x_to]->getType() == KING;
 
         delete table[y_to][x_to];
     }
@@ -115,7 +114,111 @@ void ChessModel::step(int x_from, int y_from, int x_to, int y_to)
     table[y_from][x_from] = nullptr;
 
     currentPlayer = !currentPlayer;
-    view->UpdateTable();
-    if (king)
-        giveUp();
+    view->updateTable();
+
+    if (checkIfCheck(currentPlayer))
+    {
+        if (checkIfCheckMate(currentPlayer))
+            giveUp();
+        else
+            view->alarmForCheck();
+    }
+}
+
+bool ChessModel::whatIfStep(int x_from, int y_from, int x_to, int y_to, bool player)
+{
+    // Unable to step there
+    if (!table[y_from][x_from]->step(x_to, y_to, table))
+        return true;
+
+    Piece *tempPiece = nullptr;
+
+    if (table[y_to][x_to] != nullptr)
+    {
+        // Step on self puppet
+        if (currentPlayer == table[y_to][x_to]->playerColor())
+            return true;
+
+        tempPiece = table[y_to][x_to];
+    }
+
+    table[y_from][x_from]->setCoords(x_to, y_to);
+    table[y_to][x_to] = table[y_from][x_from];
+    table[y_from][x_from] = nullptr;
+
+    bool isCheck = checkIfCheck(player);
+
+    table[y_from][x_from] = table[y_to][x_to];
+    table[y_to][x_to] = tempPiece;
+    table[y_from][x_from]->setCoords(x_from, y_from);
+
+    return isCheck;
+}
+
+bool ChessModel::checkIfCheck(bool player)
+{
+    std::pair<int, int> kingCoords;
+
+    for (std::vector<Piece *> v : table)
+        for (Piece *p : v)
+            if (p != nullptr && p->playerColor() == player && p->getType() == PieceEnum::KING)
+                kingCoords = p->getCoords();
+
+    for (std::vector<Piece *> v : table)
+        for (Piece *p : v)
+            if (p != nullptr && p->playerColor() == !player && p->step(kingCoords.first, kingCoords.second, table))
+                return true;
+
+    return false;
+}
+
+bool ChessModel::checkIfCheckMate(bool player)
+{
+
+    std::pair<int, int> kingCoords;
+    Piece *king = nullptr;
+
+    for (const std::vector<Piece *> &v : table)
+        for (Piece *p : v)
+            if (p != nullptr && p->playerColor() == player && p->getType() == PieceEnum::KING)
+                king = p;
+
+    kingCoords = king->getCoords();
+
+    std::vector<std::pair<int, int>> steps;
+
+    if (kingCoords.first > 0)
+    {
+        steps.push_back(std::make_pair<int, int>(kingCoords.first - 1, kingCoords.second + 0));
+        if (kingCoords.second > 0)
+            steps.push_back(std::make_pair<int, int>(kingCoords.first - 1, kingCoords.second - 1));
+    }
+
+    if (kingCoords.second > 0)
+    {
+        steps.push_back(std::make_pair<int, int>(kingCoords.first + 0, kingCoords.second - 1));
+        if (kingCoords.first < 8)
+            steps.push_back(std::make_pair<int, int>(kingCoords.first + 1, kingCoords.second - 1));
+    }
+
+    if (kingCoords.second < 8)
+    {
+        steps.push_back(std::make_pair<int, int>(kingCoords.first + 0, kingCoords.second + 1));
+        if (kingCoords.first > 0)
+            steps.push_back(std::make_pair<int, int>(kingCoords.first - 1, kingCoords.second + 1));
+    }
+
+    if (kingCoords.first < 8)
+    {
+        steps.push_back(std::make_pair<int, int>(kingCoords.first + 1, kingCoords.second + 0));
+        if (kingCoords.second < 8)
+            steps.push_back(std::make_pair<int, int>(kingCoords.first + 1, kingCoords.second + 1));
+    }
+
+    bool checkMate = true;
+
+    for (const std::pair<int, int> &oneStep : steps)
+        checkMate &= whatIfStep(kingCoords.first, kingCoords.second, oneStep.first, oneStep.second, player);
+
+    return checkMate;
 }

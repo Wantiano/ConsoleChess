@@ -4,7 +4,7 @@
 
 std::vector<std::vector<Piece *>> table;
 
-TEST_CASE("Testing if king would be able to step on specified field", "")
+TEST_CASE("Testing if king would be able to step on specified field")
 {
     table.resize(8);
     for (int i = 0; i < 8; ++i)
@@ -33,7 +33,7 @@ TEST_CASE("Testing if king would be able to step on specified field", "")
     CHECK_FALSE(king2.step(8, 8, table));
 }
 
-TEST_CASE("Testing if queen would be able to step on specified field", "")
+TEST_CASE("Testing if queen would be able to step on specified field")
 {
     Queen queen(4, 3, true);
     CHECK(queen.step(5, 4, table));
@@ -63,7 +63,7 @@ TEST_CASE("Testing if queen would be able to step on specified field", "")
     CHECK_FALSE(queen2.step(8, 7, table));
 }
 
-TEST_CASE("Testing if bishop would be able to step on specified field", "")
+TEST_CASE("Testing if bishop would be able to step on specified field")
 {
     Bishop bishop(4, 3, true);
     CHECK(bishop.step(5, 4, table));
@@ -86,7 +86,7 @@ TEST_CASE("Testing if bishop would be able to step on specified field", "")
     CHECK_FALSE(bishop2.step(8, 4, table));
 }
 
-TEST_CASE("Testing if rook would be able to step on specified field", "")
+TEST_CASE("Testing if rook would be able to step on specified field")
 {
     Rook rook(4, 4, true);
     CHECK(rook.step(5, 4, table));
@@ -112,7 +112,7 @@ TEST_CASE("Testing if rook would be able to step on specified field", "")
     CHECK_FALSE(rook2.step(8, 0, table));
 }
 
-TEST_CASE("Testing if knight would be able to step on specified field", "")
+TEST_CASE("Testing if knight would be able to step on specified field")
 {
     Knight knight(2, 2, true);
     CHECK(knight.step(0, 1, table));
@@ -132,7 +132,7 @@ TEST_CASE("Testing if knight would be able to step on specified field", "")
     CHECK_FALSE(knight2.step(-1, 0, table));
 }
 
-TEST_CASE("Testing if pawn would be able to step on specified field", "")
+TEST_CASE("Testing if pawn would be able to step on specified field")
 {
     Pawn white_pawn(2, 6, false);
     CHECK(white_pawn.step(2, 5, table));

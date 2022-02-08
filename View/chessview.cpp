@@ -58,6 +58,7 @@ void ChessView::newGame()
     std::cout << "Starting new game.." << std::endl;
     model.newGame();
     gameOver = false;
+    NewGameStarted();
 }
 
 void ChessView::NewGameStarted()
@@ -66,7 +67,7 @@ void ChessView::NewGameStarted()
               << "\nType \"help\" for help." << std::endl;
 
     clearConsole();
-    UpdateTable();
+    updateTable();
 
     std::string inp = "";
 
@@ -78,7 +79,7 @@ void ChessView::NewGameStarted()
         getline(std::cin, inp);
 
         if (inp == "help")
-            std::cout << "print in-game help\n"; //[FIXME]
+            printHelp(1);
         else if (inp == "leave")
             model.giveUp();
         else if (inp == "step")
@@ -119,7 +120,7 @@ void ChessView::playerSteps()
     }
 }
 
-void ChessView::UpdateTable()
+void ChessView::updateTable()
 {
     clearConsole();
 
@@ -145,6 +146,12 @@ void ChessView::GameOver()
               << "You are headed back to menu." << std::endl
               << "Type \"help\" for help." << std::endl;
     gameOver = true;
+}
+
+void ChessView::alarmForCheck()
+{
+    std::cout << "\u001b[0m"
+              << "Watch out " << (model.getPlayer() ? "White!" : "Green!") << " The king is attacked!" << std::endl;
 }
 
 std::string ChessView::getPiece(int x, int y)

@@ -12,11 +12,16 @@ private:
     ChessView *view;
     std::vector<std::vector<Piece *>> table;
     bool currentPlayer;
+    bool whatIfStep(int,int,int,int,bool);
+    bool gameOver;
 
+public: //public because of tests
     void clearTable();
     void resetTable();
+    bool checkIfCheck(bool);
+    bool checkIfCheckMate(bool);
 
-public:
+//public:
     enum Exceptions
     {
         OUTOFTABLE,
@@ -25,16 +30,16 @@ public:
     };
 
     ChessModel(ChessView *view) : view(view) {}
-
     ~ChessModel() { clearTable(); }
 
     PieceEnum getField(int x, int y);
     bool getFieldColor(int x, int y);
     int getPlayer() { return currentPlayer; }
+    bool isGameOver() { return gameOver; }
 
     void newGame();
-    void giveUp();
     void step(int x_from, int y_from, int x_to, int y_to);
+    void giveUp();
 };
 
 #endif /*CHESS_MODEL*/
