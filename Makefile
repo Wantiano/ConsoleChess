@@ -1,28 +1,28 @@
 help:
 	@echo Giving an argument is a must.
-	@echo (Arguments: chess, piecetests, modeltests)
+	@echo "(Arguments: chess, piecetests, modeltests)"
 
-chess: main.cpp View/chessview.cpp Model/chessmodel.cpp Model/Pieces/pieces.cpp
+chess: src/main.cpp src/View/chessview.cpp src/Model/chessmodel.cpp src/Model/Pieces/pieces.cpp
 	@clear
 	@echo Compiling...
 	@echo _________________________________________
 	@echo
-	@g++ main.cpp View/chessview.cpp Model/chessmodel.cpp Model/Pieces/pieces.cpp -Wall -O3 -o consolechess.out
+	@g++ src/main.cpp src/View/chessview.cpp src/Model/chessmodel.cpp src/Model/Pieces/pieces.cpp -Wall -O3 -o consolechess.out
 
-piecetests: Model/Pieces/piecetest.cpp Model/Pieces/pieces.cpp
+piecetests: src/Model/Pieces/piecetest.cpp src/Model/Pieces/pieces.cpp
 	@clear
 	@echo Compiling and running tests of Pieces...
 	@echo _________________________________________
 	@echo
-	@g++ Model/Pieces/piecetest.cpp Model/Pieces/pieces.cpp -o piecetests.out
+	@g++ src/Model/Pieces/piecetest.cpp src/Model/Pieces/pieces.cpp -o piecetests.out
 	@./piecetests.out
 	@rm piecetests.out
 	
-modeltests: Model/modeltest.cpp View/chessview.cpp Model/chessmodel.cpp Model/Pieces/pieces.cpp
+modeltests: src/Model/modeltest.cpp src/View/chessview.cpp src/Model/chessmodel.cpp src/Model/Pieces/pieces.cpp
 	@clear
-	@echo Compiling and running tests of Model...
+	@echo Compiling and running tests of src/Model...
 	@echo _________________________________________
 	@echo
-	@g++ Model/modeltest.cpp View/chessview.cpp Model/chessmodel.cpp Model/Pieces/pieces.cpp -o modeltests.out
+	@g++ src/Model/modeltest.cpp src/View/chessview.cpp src/Model/chessmodel.cpp src/Model/Pieces/pieces.cpp -o modeltests.out
 	@./modeltests.out
 	@rm modeltests.out
