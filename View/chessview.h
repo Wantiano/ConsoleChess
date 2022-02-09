@@ -35,6 +35,7 @@ public:
 
     void GameOver();
     void alarmForCheck();
+    int alarmForPromotion(bool);
     void updateTable();
     bool isGameOver() { return gameOver; }
 

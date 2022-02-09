@@ -84,6 +84,40 @@ void ChessModel::resetTable()
                                      new Rook(7, 7, false)});
 }
 
+void ChessModel::pawnPromotion(int x_to, int y_to)
+{
+    if(y_to != 7 && y_to != 0)
+        return;
+
+    Piece* p = table[y_to][x_to];
+    int piece = view->alarmForPromotion(p->playerColor());
+
+    Piece* oldPiece = p;
+
+    switch (piece)
+    {
+    case 1:
+        p = new Queen(p->getCoords().first,p->getCoords().second,p->playerColor());
+        break;
+    case 2:
+        p = new Rook(p->getCoords().first,p->getCoords().second,p->playerColor());
+        break;
+    case 3:
+        p = new Bishop(p->getCoords().first,p->getCoords().second,p->playerColor());
+        break;
+    case 4:
+        p = new Knight(p->getCoords().first,p->getCoords().second,p->playerColor());
+        break;
+    default:
+        return;
+        break;
+    }
+
+    table[y_to][x_to] = p;
+    
+    delete oldPiece;
+}
+
 void ChessModel::step(int x_from, int y_from, int x_to, int y_to)
 {
     if (x_from < 0 || x_to < 0 || y_from < 0 || y_to < 0 || x_from > 7 || x_to > 7 || y_from > 7 || y_to > 7)
@@ -104,8 +138,8 @@ void ChessModel::step(int x_from, int y_from, int x_to, int y_to)
     if (table[y_to][x_to] != nullptr && currentPlayer == table[y_to][x_to]->playerColor())
         throw Exceptions::ILLEGALMOVE;
 
-    //If player gets check after step
-    if(whatIfStep(x_from,y_from,x_to,y_to,currentPlayer))
+    // If player gets check after step
+    if (whatIfStep(x_from, y_from, x_to, y_to, currentPlayer))
         throw Exceptions::ILLEGALMOVE;
 
     if (table[y_to][x_to] != nullptr)
@@ -114,6 +148,11 @@ void ChessModel::step(int x_from, int y_from, int x_to, int y_to)
     table[y_from][x_from]->setCoords(x_to, y_to);
     table[y_to][x_to] = table[y_from][x_from];
     table[y_from][x_from] = nullptr;
+
+    view->updateTable();
+
+    if(table[y_to][x_to]->getType() == PieceEnum::PAWN)
+        pawnPromotion(x_to,y_to);
 
     currentPlayer = !currentPlayer;
     view->updateTable();
@@ -127,7 +166,7 @@ void ChessModel::step(int x_from, int y_from, int x_to, int y_to)
     }
 }
 
-//Returns if after step is check
+// Returns if after step is check
 bool ChessModel::whatIfStep(int x_from, int y_from, int x_to, int y_to, bool player)
 {
     // Unable to step there
@@ -200,26 +239,16 @@ bool ChessModel::kingCantStep(bool player, std::pair<int, int> &kingCoords)
 bool ChessModel::othersCanStep(bool player)
 {
     for (std::vector<Piece *> v : table)
-    {
         for (Piece *p : v)
-        {
-            if(p != nullptr)
+            if (p != nullptr)
             {
-                std::pair<int,int> coords = p->getCoords();
+                std::pair<int, int> coords = p->getCoords();
                 if (p->playerColor() == player)
-                {
                     for (int i = 0; i < 8; i++)
-                    {
                         for (int j = 0; j < 8; j++)
-                        {
-                            if(!whatIfStep(coords.first, coords.second, i, j, player))
+                            if (!whatIfStep(coords.first, coords.second, i, j, player))
                                 return false;
-                        }
-                    }
-                }
             }
-        }
-    }
     return true;
 }
 

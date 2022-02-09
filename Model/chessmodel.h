@@ -16,14 +16,16 @@ private:
     bool gameOver;
     bool kingCantStep(bool, std::pair<int, int> &);
     bool othersCanStep(bool);
+    void pawnPromotion(int,int);
 
-public: // public because of tests
+// public because of tests
+public:
     void clearTable();
     void resetTable();
     bool checkIfCheck(bool);
     bool checkIfCheckMate(bool);
 
-    // public:
+// public:
     enum Exceptions
     {
         OUTOFTABLE,

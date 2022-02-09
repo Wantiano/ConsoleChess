@@ -151,7 +151,7 @@ void ChessView::GameOver()
 void ChessView::alarmForCheck()
 {
     std::cout << "\u001b[0m"
-              << "Watch out " << (model.getPlayer() ? "White!" : "Green!") << " The king is attacked!" << std::endl;
+              << "Watch out " << (model.getPlayer() ? "Green!" : "White!") << " The king is attacked!" << std::endl;
 }
 
 std::string ChessView::getPiece(int x, int y)
@@ -163,9 +163,7 @@ std::string ChessView::getPiece(int x, int y)
     if (model.getFieldColor(x, y))
         piece = "\e[1;37m";
     else
-        piece = "\e[1;32m"; /*
-    else
-        piece = "\u001b[0m";*/
+        piece = "\e[1;32m";
 
     switch (p)
     {
@@ -203,15 +201,28 @@ std::string ChessView::getPiece(int x, int y)
 std::pair<int, int> ChessView::getFieldFromString(std::string field)
 {
     std::pair<int, int> p;
-
-    if (field[0] > 96)
-        p.first = field[0] - 97;
-    else
-        p.first = field[0] - 65;
-
+    p.first = field[0] - (field[0] > 96 ? 97 : 65);
     p.second = 8 - (field[1] - 48);
-
     return p;
+}
+
+int ChessView::alarmForPromotion(bool player)
+{
+    std::string inp = "";
+    int piece;
+    do
+    {
+        std::cout << "Your pawn reached the last field. What would you like to exchange it for?" << std::endl
+                  << "1. Queen" << std::endl
+                  << "2. Rook" << std::endl
+                  << "3. Bishop" << std::endl
+                  << "4. Knight" << std::endl
+                  << "5. Pawn" << std::endl
+                  << " > ";
+        std::cin >> inp;
+        piece = atoi(inp.c_str());
+    } while (piece < 1 || piece > 5);
+    return piece;
 }
 
 void clearConsole()
