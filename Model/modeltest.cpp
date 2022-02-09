@@ -40,3 +40,13 @@ TEST_CASE("Testing check but not checkmate because other piece can step in way")
     model->step(4, 3, 5, 5);
     CHECK_FALSE(model->isGameOver());
 }
+
+TEST_CASE("Testing illegal move if player got check if would have stepped")
+{
+    model->newGame();
+    model->step(0, 6, 0, 4);
+    model->step(4, 1, 4, 2);
+    model->step(0, 7, 0, 6);
+    model->step(3, 0, 7, 4);
+    CHECK_THROWS_AS(model->step(5, 6, 5, 5),ChessModel::Exceptions);
+}

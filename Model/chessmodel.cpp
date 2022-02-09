@@ -100,14 +100,16 @@ void ChessModel::step(int x_from, int y_from, int x_to, int y_to)
     if (currentPlayer != table[y_from][x_from]->playerColor())
         throw Exceptions::ILLEGALMOVE;
 
-    if (table[y_to][x_to] != nullptr)
-    {
-        // Step on self puppet
-        if (currentPlayer == table[y_to][x_to]->playerColor())
-            throw Exceptions::ILLEGALMOVE;
+    // Step on self puppet
+    if (table[y_to][x_to] != nullptr && currentPlayer == table[y_to][x_to]->playerColor())
+        throw Exceptions::ILLEGALMOVE;
 
+    //If player gets check after step
+    if(whatIfStep(x_from,y_from,x_to,y_to,currentPlayer))
+        throw Exceptions::ILLEGALMOVE;
+
+    if (table[y_to][x_to] != nullptr)
         delete table[y_to][x_to];
-    }
 
     table[y_from][x_from]->setCoords(x_to, y_to);
     table[y_to][x_to] = table[y_from][x_from];
