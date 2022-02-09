@@ -12,16 +12,18 @@ private:
     ChessView *view;
     std::vector<std::vector<Piece *>> table;
     bool currentPlayer;
-    bool whatIfStep(int,int,int,int,bool);
+    bool whatIfStep(int, int, int, int, bool);
     bool gameOver;
+    bool kingCantStep(bool, std::pair<int, int> &);
+    bool othersCanStep(bool);
 
-public: //public because of tests
+public: // public because of tests
     void clearTable();
     void resetTable();
     bool checkIfCheck(bool);
     bool checkIfCheckMate(bool);
 
-//public:
+    // public:
     enum Exceptions
     {
         OUTOFTABLE,

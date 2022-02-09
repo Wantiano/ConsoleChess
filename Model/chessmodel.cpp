@@ -125,6 +125,7 @@ void ChessModel::step(int x_from, int y_from, int x_to, int y_to)
     }
 }
 
+//Returns if after step is check
 bool ChessModel::whatIfStep(int x_from, int y_from, int x_to, int y_to, bool player)
 {
     // Unable to step there
@@ -155,38 +156,9 @@ bool ChessModel::whatIfStep(int x_from, int y_from, int x_to, int y_to, bool pla
     return isCheck;
 }
 
-bool ChessModel::checkIfCheck(bool player)
+bool ChessModel::kingCantStep(bool player, std::pair<int, int> &kingCoords)
 {
-    std::pair<int, int> kingCoords;
-
-    for (std::vector<Piece *> v : table)
-        for (Piece *p : v)
-            if (p != nullptr && p->playerColor() == player && p->getType() == PieceEnum::KING)
-                kingCoords = p->getCoords();
-
-    for (std::vector<Piece *> v : table)
-        for (Piece *p : v)
-            if (p != nullptr && p->playerColor() == !player && p->step(kingCoords.first, kingCoords.second, table))
-                return true;
-
-    return false;
-}
-
-bool ChessModel::checkIfCheckMate(bool player)
-{
-
-    std::pair<int, int> kingCoords;
-    Piece *king = nullptr;
-
-    for (const std::vector<Piece *> &v : table)
-        for (Piece *p : v)
-            if (p != nullptr && p->playerColor() == player && p->getType() == PieceEnum::KING)
-                king = p;
-
-    kingCoords = king->getCoords();
-
     std::vector<std::pair<int, int>> steps;
-
     if (kingCoords.first > 0)
     {
         steps.push_back(std::make_pair<int, int>(kingCoords.first - 1, kingCoords.second + 0));
@@ -215,10 +187,70 @@ bool ChessModel::checkIfCheckMate(bool player)
             steps.push_back(std::make_pair<int, int>(kingCoords.first + 1, kingCoords.second + 1));
     }
 
-    bool checkMate = true;
+    bool cantStep = true;
 
     for (const std::pair<int, int> &oneStep : steps)
-        checkMate &= whatIfStep(kingCoords.first, kingCoords.second, oneStep.first, oneStep.second, player);
+        cantStep &= whatIfStep(kingCoords.first, kingCoords.second, oneStep.first, oneStep.second, player);
+
+    return cantStep;
+}
+
+bool ChessModel::othersCanStep(bool player)
+{
+    for (std::vector<Piece *> v : table)
+    {
+        for (Piece *p : v)
+        {
+            if(p != nullptr)
+            {
+                std::pair<int,int> coords = p->getCoords();
+                if (p->playerColor() == player)
+                {
+                    for (int i = 0; i < 8; i++)
+                    {
+                        for (int j = 0; j < 8; j++)
+                        {
+                            if(!whatIfStep(coords.first, coords.second, i, j, player))
+                                return false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
+
+bool ChessModel::checkIfCheck(bool player)
+{
+    std::pair<int, int> kingCoords;
+
+    for (std::vector<Piece *> v : table)
+        for (Piece *p : v)
+            if (p != nullptr && p->playerColor() == player && p->getType() == PieceEnum::KING)
+                kingCoords = p->getCoords();
+
+    for (std::vector<Piece *> v : table)
+        for (Piece *p : v)
+            if (p != nullptr && p->playerColor() == !player && p->step(kingCoords.first, kingCoords.second, table))
+                return true;
+
+    return false;
+}
+
+bool ChessModel::checkIfCheckMate(bool player)
+{
+    std::pair<int, int> kingCoords;
+    Piece *king = nullptr;
+
+    for (const std::vector<Piece *> &v : table)
+        for (Piece *p : v)
+            if (p != nullptr && p->playerColor() == player && p->getType() == PieceEnum::KING)
+                king = p;
+
+    kingCoords = king->getCoords();
+
+    bool checkMate = kingCantStep(player, kingCoords) && othersCanStep(player);
 
     return checkMate;
 }
