@@ -126,12 +126,12 @@ void ChessModel::step(int x_from, int y_from, int x_to, int y_to)
     if (table[y_from][x_from] == nullptr)
         throw Exceptions::EMPTYFIELD;
 
-    // Unable to step there
-    if (!table[y_from][x_from]->step(x_to, y_to, table))
-        throw Exceptions::ILLEGALMOVE;
-
     // Opponent's puppet
     if (currentPlayer != table[y_from][x_from]->playerColor())
+        throw Exceptions::ILLEGALMOVE;
+        
+    // Unable to step there
+    if (!table[y_from][x_from]->step(x_to, y_to, table))
         throw Exceptions::ILLEGALMOVE;
 
     // Step on self puppet

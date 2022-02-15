@@ -45,9 +45,13 @@ public:
 
 class King : public Piece
 {
+    bool moved;
+
 public:
-    King(int x, int y, bool color) : Piece(x, y, color, KING) {}
+    King(int x, int y, bool color) : Piece(x, y, color, KING), moved(false) {}
     bool step(int, int, const std::vector<std::vector<Piece *>> &) override;
+    void setMoved() { moved = true; }
+    bool getMoved() { return moved; }
 };
 
 class Queen : public Piece
@@ -66,9 +70,13 @@ public:
 
 class Rook : public Piece
 {
+    bool moved;
+
 public:
-    Rook(int x, int y, bool color) : Piece(x, y, color, ROOK) {}
+    Rook(int x, int y, bool color) : Piece(x, y, color, ROOK), moved(false) {}
     bool step(int, int, const std::vector<std::vector<Piece *>> &) override;
+    void setMoved() { moved = true; }
+    bool getMoved() { return moved; }
 };
 
 class Knight : public Piece
